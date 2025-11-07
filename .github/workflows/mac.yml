@@ -59,6 +59,7 @@ jobs:
       working-directory: examples/libcalc
       env:
         CL_SOURCE_REGISTRY: "${{ github.workspace }}//"
+        HEAP_SIZE: 1024
       run: |
         $SBCL_SRC/run-sbcl.sh --load script.lisp --quit
         pushd libcalc

@@ -71,6 +71,27 @@
                                             :function-prefix (api-function-prefix api)
                                             :error-map (api-error-map api))))))))))
 
+(defun error-if-not-alphanumeric (str)
+  (unless (every #'(lambda (char)
+		     (or (alpha-char-p char)
+			 (digit-char-p char)))
+		 str)
+    (error "Lisp init arg must be alphanumeric: ~a" str)))
+
+(defun format-init-args (initialize-lisp-args)
+  "This formats sbcl init args in generated c code as either strings or environment variables."
+  (loop :for arg :in initialize-lisp-args
+        :collect (etypecase arg
+                   (cons
+		    (cond ((eq (first arg) ':env)
+			   (error-if-not-alphanumeric (second arg))
+			   (format nil "getenv(\"~a\")" (second arg)))
+			  (t
+			   (error "Invalid lisp arg: ~a" arg))))
+                   (string
+		    (error-if-not-alphanumeric arg)
+                    (format nil "~s" arg)))))
+
 (defun write-init-function (name linkage stream &optional (initialize-lisp-args nil))
   (terpri stream)
   (format stream "extern int initialize_lisp(int argc, char **argv);~%~%")
@@ -79,8 +100,8 @@
                                   :datap nil
                                   :linkage linkage))
   (format stream "  static int initialized = 0;~%")
-  (format stream "  char *init_args[] = {\"\", \"--core\", core, \"--noinform\", ~{\"~a\"~^, ~}};~%"
-          initialize-lisp-args)
+  (format stream "  char *init_args[] = {\"\", \"--core\", core, \"--noinform\", ~{~a~^, ~}};~%"
+          (format-init-args initialize-lisp-args))
   (format stream "  if (initialized) return 1;~%")
   (format stream "  if (initialize_lisp(~a, init_args) != 0) return -1;~%"
           (+ 4 (length initialize-lisp-args)))

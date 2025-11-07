@@ -77,6 +77,7 @@ jobs:
       env:
         CL_SOURCE_REGISTRY: "${{ github.workspace }}//"
         MSYS_PATH_TYPE: inherit
+        HEAP_SIZE: 1024
       shell: pwsh
       run: |
         $env:MINGW64_PATH="D:\a\_temp\msys64\mingw64\bin"
