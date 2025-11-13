@@ -10,7 +10,5 @@
 
 (sbcl-librarian:build-python-bindings calc "." :omit-init-call t)
 
-(sbcl-librarian:build-bindings calc "." :initialize-lisp-args (list "--dynamic-space-size"
-                                                                    (if (uiop:getenv HEAP_SIZE)
-                                                                        (:env "HEAP_SIZE")
-                                                                        "2048")))
+(sbcl-librarian:build-bindings calc "." :initialize-lisp-args '("--dynamic-space-size"
+                                                                (:env "HEAP_SIZE")))

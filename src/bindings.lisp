@@ -73,9 +73,11 @@
 
 (defun error-if-not-alphanumeric (str)
   (unless (every #'(lambda (char)
-		     (or (alpha-char-p char)
-			 (digit-char-p char)))
-		 str)
+                     (or (alpha-char-p char)
+                         (digit-char-p char)
+                         (char= char #\_)
+                         (char= char #\-)))
+                 str)
     (error "Lisp init arg must be alphanumeric: ~a" str)))
 
 (defun format-init-args (initialize-lisp-args)
@@ -83,13 +85,13 @@
   (loop :for arg :in initialize-lisp-args
         :collect (etypecase arg
                    (cons
-		    (cond ((eq (first arg) ':env)
-			   (error-if-not-alphanumeric (second arg))
-			   (format nil "getenv(\"~a\")" (second arg)))
-			  (t
-			   (error "Invalid lisp arg: ~a" arg))))
+                    (cond ((eq (first arg) ':env)
+                           (error-if-not-alphanumeric (second arg))
+                           (format nil "getenv(\"~a\")" (second arg)))
+                          (t
+                           (error "Invalid lisp arg: ~a" arg))))
                    (string
-		    (error-if-not-alphanumeric arg)
+                    (error-if-not-alphanumeric arg)
                     (format nil "~s" arg)))))
 
 (defun write-init-function (name linkage stream &optional (initialize-lisp-args nil))

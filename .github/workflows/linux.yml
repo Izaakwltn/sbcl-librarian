@@ -43,6 +43,7 @@ jobs:
       env:
         LIBRARY_PATH: ${{ github.workspace }}/../sbcl/src/runtime
         LD_LIBRARY_PATH: ${{ github.workspace }}/../sbcl/src/runtime
+        HEAP_SIZE: 1024
       run: |
         conda install -y conda-build
         conda build recipe --output-folder conda-bld
@@ -52,11 +53,11 @@ jobs:
         echo "LIBRARY_PATH=$LIBSBCL_PATH:$CONDA_PREFIX/lib:$CONDA_PREFIX/lib64" >> "$GITHUB_ENV"
         echo "LD_LIBRARY_PATH=$LIBSBCL_PATH:$CONDA_PREFIX/lib:$CONDA_PREFIX/lib64" >> "$GITHUB_ENV"
         echo "C_INCLUDE_PATH=$CONDA_PREFIX/include" >> "$GITHUB_ENV"
+        echo "HEAP_SIZE=1024" >> "$GITHUB_ENV"
     - name: build and run example
       working-directory: examples/libcalc
       env:
         CL_SOURCE_REGISTRY: "${{ github.workspace }}//"
-        HEAP_SIZE: 1024
       run: |
         $SBCL_SRC/run-sbcl.sh --load script.lisp --quit
         pushd libcalc
