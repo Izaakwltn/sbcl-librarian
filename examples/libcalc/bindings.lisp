@@ -9,6 +9,9 @@
     (let ((test '()))
       (loop (push 1 test)))))
 
+(defun print-dynamic-space-size ()
+  (format *standard-output* "~%~%~% HEAP SIZE:~%~d~%~%~%" (sb-ext:dynamic-space-size)))
+
 (sbcl-librarian:define-api libcalc-api (:function-prefix "calc_")
   (:literal "/* types */")
   (:type expr-type)
@@ -25,7 +28,8 @@
    (parse expr-type ((source :string)))
    (expression-to-string :string ((expr expr-type)))
    (remove-zeros expr-type ((expr expr-type)))
-   (exhaust-heap :void ())))
+   (exhaust-heap :void ())
+   (print-dynamic-space-size :void ())))
 
 (sbcl-librarian:define-aggregate-library calc (:function-linkage "CALC_API")
   libcalc-api)

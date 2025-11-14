@@ -53,7 +53,7 @@ jobs:
         echo "LIBRARY_PATH=$LIBSBCL_PATH:$CONDA_PREFIX/lib:$CONDA_PREFIX/lib64" >> "$GITHUB_ENV"
         echo "LD_LIBRARY_PATH=$LIBSBCL_PATH:$CONDA_PREFIX/lib:$CONDA_PREFIX/lib64" >> "$GITHUB_ENV"
         echo "C_INCLUDE_PATH=$CONDA_PREFIX/include" >> "$GITHUB_ENV"
-        echo "HEAP_SIZE=1024" >> "$GITHUB_ENV"
+        echo "HEAP_SIZE=2048" >> "$GITHUB_ENV"
     - name: build and run example
       working-directory: examples/libcalc
       env:
@@ -71,4 +71,6 @@ jobs:
         gcc -Wall -o example example.c -lcalc -lsbcl_librarian -lsbcl
         echo "(+ 1 2)" | LD_LIBRARY_PATH="$LIBSBCL_PATH:$CONDA_PREFIX/lib" ./example | tr -d '\n' | grep "hello from preload> 3> "
         echo "(+ 1 2)" | LD_LIBRARY_PATH="$LIBSBCL_PATH:$CONDA_PREFIX/lib" python ./example.py | tr -d '\n' | grep "> 3> "
+        echo $HEAP_SIZE
+        LD_LIBRARY_PATH="$LIBSBCL_PATH:$CONDA_PREFIX/lib" python ./check_dynamic_space_size.py
         LD_LIBRARY_PATH="$LIBSBCL_PATH:$CONDA_PREFIX/lib" python ./exhaust_heap.py | grep "returned to Python after heap exhaustion (attempt 1)"
