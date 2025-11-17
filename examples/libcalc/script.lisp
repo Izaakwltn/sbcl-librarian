@@ -5,11 +5,11 @@
 
 (in-package #:sbcl-librarian/example/libcalc)
 
-#+ig(sbcl-librarian:create-fasl-library-cmake-project "libcalc" calc "./libcalc/"
-                                                  :preload-eval-expr "(format t \"hello from preload~%\")")
+(sbcl-librarian:create-fasl-library-cmake-project "libcalc" calc "./libcalc/"
+                                                  :preload-eval-expr "(format t \"hello from preload~%\")"
+                                                  ;:initialize-lisp-args
+                                                  #+ig
+                                                  ("--dynamic-space-size"
+                                                   (:env "HEAP_SIZE")))
 
 (sbcl-librarian:build-python-bindings calc "." :omit-init-call t)
-
-(sbcl-librarian:build-bindings calc "." :initialize-lisp-args '("--dynamic-space-size"
-                                                                "4098" ;(:env "HEAP_SIZE")
-                                                                ))
