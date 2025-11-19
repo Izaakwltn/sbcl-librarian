@@ -43,14 +43,25 @@ static void return_from_lisp(void)
 
 static void do_initialize_lisp(const char *libsbcl_librarian_path)
 {
+  printf("Initializing lisp");
     char *libsbcl_librarian_dir = dir_name(libsbcl_librarian_path);
     int libsbcl_librarian_dir_len = strlen(libsbcl_librarian_dir);
     int core_path_size = libsbcl_librarian_dir_len + sizeof("sbcl_librarian.core") + 1;
     char *core_path = malloc(core_path_size);
+    char *heap_size;
 
     snprintf(core_path, core_path_size, "%ssbcl_librarian.core", libsbcl_librarian_dir);
 
-    const char *init_args[] = {"", "--dynamic-space-size", "8192", "--core", core_path, "--noinform", "--no-userinit"};
+    if (getenv("SBCL_LIBRARIAN_HEAP_SIZE")) {
+      printf("HEAP_SIZE detected\n");
+      char *heap_size = getenv("SBCL_LIBRARIAN_HEAP_SIZE");
+    } else {
+      char *heap_size = "4096";
+    }
+
+    printf("HEAP_SIZE: %s\n", heap_size);
+
+    const char *init_args[] = {"", "--dynamic-space-size", "4096", "--core", core_path, "--noinform", "--no-userinit"};
 
     /*
      * It seems that on Linux, dlsym(NULL, "sym") fails to find "sym"
