@@ -17,7 +17,9 @@ shared library constructor that loads the embedded FASLs.")
 SBCL runtime.")
 
 (defun create-fasl-library-cmake-project (system-name library directory &key (base-library-name *base-library-name*)
-                                                                          preload-eval-expr)
+                                                                          preload-eval-expr
+                                                                          (omit-init-function t)
+                                                                          (initialize-lisp-args nil))
   "Generate a CMake project in DIRECTORY for a shared library that, when
 loaded into a process that has already initialized the SBCL runtime,
 adds the C symbols for LIBRARY to the current process's symbol table
@@ -44,7 +46,8 @@ be EVALed before loading FASLs."
                           (list target-system)))
          (*base-library-name* base-library-name))
     (compile-bundle-system-with-dependencies target-system build-directory)
-    (build-bindings library build-directory :omit-init-function t)
+    (if omit-init-function
+        (build-bindings library build-directory :omit-init-function t))
     (create-incbin-source-file build-directory)
     (create-fasl-loader-source-file library systems build-directory :preload-eval-expr preload-eval-expr)
     (create-cmakelists-file library systems build-directory)))
