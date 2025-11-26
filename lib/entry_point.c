@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include <stdbool.h>
 
 #include "sbcl_librarian.h"
 
@@ -25,6 +27,8 @@ __thread jmp_buf fatal_lisp_error_handler;
 #endif
 
 #define BUF_SIZE 1024
+
+#define DEFAULT_HEAP_SIZE "8192"
 
 extern char *dir_name(char *path);
 extern void set_lossage_handler(void (*handler)(void));
@@ -48,9 +52,23 @@ static void do_initialize_lisp(const char *libsbcl_librarian_path)
     int core_path_size = libsbcl_librarian_dir_len + sizeof("sbcl_librarian.core") + 1;
     char *core_path = malloc(core_path_size);
 
+    /*
+     * Managing heap size with the environment variable SBCL_LIBRARIAN_HEAP_SIZE
+     */
+
+    char* heap_size;
+
+    char* get_env_heap_size = getenv("SBCL_LIBRARIAN_HEAP_SIZE");
+
+    if (get_env_heap_size == NULL || strlen(get_env_heap_size) == 0) {
+      heap_size = DEFAULT_HEAP_SIZE;
+    } else {
+      heap_size = get_env_heap_size;
+    }
+
     snprintf(core_path, core_path_size, "%ssbcl_librarian.core", libsbcl_librarian_dir);
 
-    const char *init_args[] = {"", "--dynamic-space-size", "8192", "--core", core_path, "--noinform", "--no-userinit"};
+    const char *init_args[] = {"", "--dynamic-space-size", heap_size, "--core", core_path, "--noinform", "--no-userinit"};
 
     /*
      * It seems that on Linux, dlsym(NULL, "sym") fails to find "sym"

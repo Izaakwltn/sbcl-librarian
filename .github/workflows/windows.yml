@@ -94,4 +94,9 @@ jobs:
         if ((echo '(+ 1 2)' | .\example.exe) -match "3") { exit 0 } else { exit 1 }
         if ((echo '(+ 1 2)' | .\example.exe) -match "hello from preload") { exit 0 } else { exit 1 }
         if ((echo '(+ 1 2)' | python example.py) -match "3") { exit 0 } else { exit 1 }
+        
+        $env:SBCL_LIBRARIAN_HEAP_SIZE=6144
+
+        if ((python check_dynamic_space_size.py) -match "6442450944") { exit 0 } else { exit 1 }
+
         if ((python exhaust_heap.py) -match "attempt 1") { exit 0 } else { exit 1 }

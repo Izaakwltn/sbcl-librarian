@@ -69,4 +69,9 @@ jobs:
         gcc -Wall -o example example.c -lcalc -lsbcl_librarian -lsbcl
         echo "(+ 1 2)" | LD_LIBRARY_PATH="$LIBSBCL_PATH:$CONDA_PREFIX/lib" ./example | tr -d '\n' | grep "hello from preload> 3> "
         echo "(+ 1 2)" | LD_LIBRARY_PATH="$LIBSBCL_PATH:$CONDA_PREFIX/lib" python ./example.py | tr -d '\n' | grep "> 3> "
+
+        export SBCL_LIBRARIAN_HEAP_SIZE=7000
+
+        LD_LIBRARY_PATH="$LIBSBCL_PATH:$CONDA_PREFIX/lib" python ./check_dynamic_space_size.py | grep "7340032000"
+        
         LD_LIBRARY_PATH="$LIBSBCL_PATH:$CONDA_PREFIX/lib" python ./exhaust_heap.py | grep "returned to Python after heap exhaustion (attempt 1)"

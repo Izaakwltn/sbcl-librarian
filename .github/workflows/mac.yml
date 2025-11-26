@@ -72,4 +72,8 @@ jobs:
         gcc -Wall -o example example.c -lcalc -lsbcl_librarian
         echo "(+ 1 2)" | ./example | tr -d '\n' | grep "hello from preload> 3> "
         echo "(+ 1 2)" | python ./example.py | tr -d '\n' | grep "> 3> "
+        export SBCL_LIBRARIAN_HEAP_SIZE=4096
+
+        python ./check_dynamic_space_size.py | grep "4294967296"
+        
         python ./exhaust_heap.py | grep "returned to Python after heap exhaustion (attempt 1)"
